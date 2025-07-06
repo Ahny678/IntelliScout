@@ -1,50 +1,73 @@
+import {
+  IsArray,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+
 import { User } from 'src/users/entities/user.entity';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-
+import { EducationEntry, WorkEntry } from '../interfaces/entry.interface';
 @Entity()
 export class Resume {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @IsString()
+  @Column()
   name: string;
+
   @ManyToOne(() => User, (user) => user.resumes)
   user: User;
 
+  @IsOptional()
+  @IsString()
   @Column({ nullable: true })
   currentJobTitle: string;
 
+  @IsOptional()
+  @IsNumber()
   @Column({ nullable: true })
   yearsOfExperience: number;
 
+  @IsOptional()
+  @IsArray()
   @Column('simple-array', { nullable: true })
-  skills: string[]; // e.g., ['React', 'Node.js', 'SQL']
+  skills: string[];
 
+  @IsOptional()
+  @IsString()
   @Column({ nullable: true })
-  highestEducationLevel: string; // e.g., 'Bachelors', 'Masters', 'PhD'
+  highestEducationLevel: string;
 
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => EducationEntry)
   @Column('simple-json', { nullable: true })
-  education: {
-    degree: string;
-    field: string;
-    institution: string;
-    graduationYear: number;
-  }[];
+  education: EducationEntry[];
 
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => WorkEntry)
   @Column('simple-json', { nullable: true })
-  workExperience: {
-    title: string;
-    company: string;
-    startYear: number;
-    endYear?: number;
-    industry?: string;
-  }[];
+  workExperience: WorkEntry[];
 
+  @IsOptional()
+  @IsArray()
   @Column('simple-array', { nullable: true })
-  certifications: string[]; // e.g., ['AWS Certified Developer']
+  certifications: string[];
 
+  @IsOptional()
+  @IsString()
   @Column({ nullable: true })
   preferredJobLocation: string;
 
+  @IsOptional()
+  @IsNumber()
   @Column({ nullable: true })
   desiredSalary: number;
 }

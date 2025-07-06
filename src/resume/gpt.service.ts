@@ -2,14 +2,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-// /* eslint-disable @typescript-eslint/no-unsafe-return */
 
 import { Injectable } from '@nestjs/common';
 import { AzureKeyCredential } from '@azure/core-auth';
 import ModelClient, { isUnexpected } from '@azure-rest/ai-inference';
 import { promptText } from './prompt/prompt';
 import * as dotenv from 'dotenv';
+import { ResumeDataResult } from './interfaces/resume-json.interface';
 
 dotenv.config();
 
@@ -27,7 +26,7 @@ export class GptService {
     this.client = ModelClient(endpoint, new AzureKeyCredential(token));
   }
 
-  async extractResumeData(text: string): Promise<any> {
+  async extractResumeData(text: string): Promise<ResumeDataResult> {
     const prompt = `${promptText}\n\n${text}`;
 
     const response = await this.client.path('/chat/completions').post({
@@ -56,7 +55,7 @@ Do not return plain text or explanations outside of JSON.`,
     try {
       console.log(text);
       console.log('Raw GPT response:', jsonString);
-      return JSON.parse(jsonString);
+      return JSON.parse(jsonString) as ResumeDataResult;
     } catch (e) {
       console.log(e);
       throw new Error('Failed to parse GPT response as JSON:');
