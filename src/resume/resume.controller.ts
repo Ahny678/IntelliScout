@@ -1,16 +1,30 @@
-import { Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  UseGuards,
+  Req,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { ResumeService } from './resume.service';
+import { ResumeDto } from './dtos/resume.dto';
+import { AuthGuard } from 'src/guards/auth/auth.guard';
+import { AuthenticatedRequest } from 'src/auth/interfaces/jwt-payload.interface';
+import { FileInterceptor } from '@nestjs/platform-express';
 
+@UseGuards(AuthGuard)
 @Controller('resume')
 export class ResumeController {
-  constructor(resumeService: ResumeService) {}
+  constructor(readonly resumeService: ResumeService) {}
   @Post('save-info')
-  async saveInfo() {
-    //collect text.
-    //  if it is in a file, extract the file to text
-    //send this text as a query to gpt4.1
-    //gpt returns the json version of the information
-    //use class transformer to change this to an instance that can be saved to database
-    //save to database
+  @UseInterceptors(FileInterceptor('resumeFile'))
+  async saveInfo(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: ResumeDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    const userId = req.user.id;
+    return await this.resumeService.handleResume(body, file, userId);
   }
 }

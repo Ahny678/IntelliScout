@@ -1,13 +1,11 @@
-import { IsMimeType, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { Express } from 'express';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class ResumeDto {
-  @IsOptional()
   @IsString()
-  resumeText?: string;
-
-  @IsOptional()
   @IsNotEmpty()
-  @IsMimeType()
-  resumeFile?: Express.Multer.File;
+  resumeName: string;
+
+  @IsString()
+  @IsOptional()
+  resumeText?: string;
 }

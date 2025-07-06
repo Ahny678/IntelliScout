@@ -6,6 +6,7 @@ export class Resume {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  name: string;
   @ManyToOne(() => User, (user) => user.resumes)
   user: User;
 
