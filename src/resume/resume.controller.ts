@@ -30,12 +30,14 @@ export class ResumeController {
     @Req() req: AuthenticatedRequest,
   ) {
     const userId = req.user.id;
-    return await this.resumeService.handleResume(body, file, userId);
-  }
-
-  @Post('test-queue')
-  async testQueue() {
-    await this.resumeQueue.add('transform', { fileName: 'babe' });
-    return { message: 'Test job has been sent' };
+    await this.resumeQueue.add('transform', {
+      userId,
+      body,
+      file,
+    });
+    return {
+      message:
+        ' Resume submitted for processing. If successyul, mail will be sent. Else, wrong input data',
+    };
   }
 }

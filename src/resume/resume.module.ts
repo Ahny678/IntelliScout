@@ -15,7 +15,11 @@ import { ResumeConsumer } from './resume.worker';
         host: 'localhost',
         port: 6379,
       },
-      defaultJobOptions: { attempts: 3 },
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 3000 },
+        removeOnComplete: true,
+      },
     }),
     BullModule.registerQueue({
       name: 'process-resume',
