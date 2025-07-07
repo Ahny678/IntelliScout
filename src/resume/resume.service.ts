@@ -7,10 +7,16 @@ import { plainToInstance } from 'class-transformer';
 import { Resume } from './entities/resume.entity';
 import { validate } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ResumeService {
-  constructor(private readonly gptService: GptService) {}
+  constructor(
+    private readonly gptService: GptService,
+    @InjectRepository(Resume)
+    private resumeRepository: Repository<Resume>,
+  ) {}
   async handleResume(
     body: ResumeDto,
     file: Express.Multer.File,
@@ -29,7 +35,6 @@ export class ResumeService {
     if ('error' in json) {
       throw new BadRequestException(json.error);
     }
-    // const preRes = { ...json, user: { id: userId }, name: body.resumeName };
     const preRes = {
       ...json,
       user: plainToInstance(User, { id: userId }),
@@ -44,10 +49,7 @@ export class ResumeService {
       console.error(errors);
       throw new Error('Validation failed');
     }
-    // await this.resumeRepository.save(resumeEntity);
-    return resumeEntity;
-    //save to database
-    //send email of success
-    //implement rabbitmq queues
+    const newResume = await this.resumeRepository.save(resumeEntity);
+    return newResume;
   }
 }

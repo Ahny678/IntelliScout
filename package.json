@@ -22,6 +22,7 @@
   "dependencies": {
     "@azure-rest/ai-inference": "^1.0.0-beta.6",
     "@azure/core-auth": "^1.9.0",
+    "@nestjs/bullmq": "^11.0.2",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
@@ -30,6 +31,7 @@
     "@nestjs/typeorm": "^11.0.0",
     "@types/pdf-parse": "^1.1.5",
     "bcrypt": "^6.0.0",
+    "bullmq": "^5.56.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "pdf-parse": "^1.1.1",
