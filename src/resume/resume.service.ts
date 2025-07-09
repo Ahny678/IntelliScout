@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ResumeDto } from './dtos/resume.dto';
 import * as PdfParse from 'pdf-parse';
 import { GptService } from './gpt.service';
@@ -10,6 +10,9 @@ import { User } from 'src/users/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserInputError } from 'src/errors/user-input-error';
+import { UpdateResumeDto } from './dtos/update-resume.dto';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class ResumeService {
@@ -17,6 +20,7 @@ export class ResumeService {
     private readonly gptService: GptService,
     @InjectRepository(Resume)
     private resumeRepository: Repository<Resume>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
   async handleResume(
     body: ResumeDto,
@@ -59,5 +63,58 @@ export class ResumeService {
       }
       throw err;
     }
+  }
+
+  async getAllResumes(userId: string) {
+    const resumes = await this.resumeRepository.find({
+      where: { user: { id: userId } },
+    });
+    return resumes;
+  }
+
+  async getResumeDetails(id: string, userId: string) {
+    const resumeDetails = await this.resumeRepository.findOne({
+      where: { id, user: { id: userId } },
+    });
+    if (!resumeDetails) {
+      throw new NotFoundException(
+        'Resume with such id does not exist OR you do not own this resource',
+      );
+    }
+    return resumeDetails;
+  }
+
+  async updateResumeDetails(id: string, body: UpdateResumeDto, userId: string) {
+    const resume = await this.resumeRepository.findOne({
+      where: {
+        id,
+        user: { id: userId },
+      },
+    });
+
+    if (!resume) {
+      throw new NotFoundException('Resume not found or access denied');
+    }
+
+    Object.assign(resume, body);
+    //delete the cache
+    const cacheKey = `jobs:${resume.id}`;
+    await this.cacheManager.del(cacheKey);
+
+    return this.resumeRepository.save(resume);
+  }
+
+  async destroyResume(id: string, userId: string) {
+    const resume = await this.resumeRepository.findOne({
+      where: { id, user: { id: userId } },
+    });
+
+    if (!resume) {
+      throw new NotFoundException('Resume not found or access denied');
+    }
+    //delete the cache
+    const cacheKey = `jobs:${resume.id}`;
+    await this.cacheManager.del(cacheKey);
+    await this.resumeRepository.remove(resume);
   }
 }

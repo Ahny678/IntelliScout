@@ -52,8 +52,8 @@ export class JobService {
 
     if (resume.currentJobTitle) queryParts.push(resume.currentJobTitle);
     if (resume.skills?.length) queryParts.push(resume.skills.join(' '));
-    if (resume.preferredJobLocation)
-      queryParts.push(`in ${resume.preferredJobLocation}`);
+    // if (resume.preferredJobLocation)
+    //   queryParts.push(`in ${resume.preferredJobLocation}`);
 
     const query = queryParts.join(' ');
 
