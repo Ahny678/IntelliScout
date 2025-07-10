@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { GetJobsDto } from './dtos/job-query-params.dto';
+import { createCacheKey } from 'src/helpers/cache-hash';
 
 @Injectable()
 export class JobService {
@@ -19,7 +20,8 @@ export class JobService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
   async getJobs(resumeId: string, query: GetJobsDto) {
-    const cacheKey = `jobs:${resumeId}`;
+    // const cacheKey = `jobs:${resumeId}`;
+    const cacheKey = createCacheKey(resumeId, query);
     const cached = await this.cacheManager.get(cacheKey);
     if (cached) {
       console.log('Hit cache');
