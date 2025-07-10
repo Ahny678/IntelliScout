@@ -17,6 +17,7 @@ import { User } from 'src/users/entities/user.entity';
         database: configService.get<string>('DB_NAME'),
         entities: [User, Resume],
         synchronize: true, // disable in production!
+        // dropSchema: true, // ⚠️ Use only in dev/test!
       }),
     }),
   ],

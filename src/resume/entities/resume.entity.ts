@@ -62,11 +62,6 @@ export class Resume {
   certifications: string[];
 
   @IsOptional()
-  @IsString()
-  @Column({ nullable: true })
-  preferredJobLocation: string;
-
-  @IsOptional()
   @IsNumber()
   @Column({ nullable: true })
   desiredSalary: number;

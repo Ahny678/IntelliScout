@@ -24,7 +24,6 @@ export const promptText = `Extract the following structured information from thi
     }
   ],
   "certifications": string[],
-  "preferredJobLocation": string,
   "desiredSalary": number
 }
 

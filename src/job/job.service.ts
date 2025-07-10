@@ -8,6 +8,7 @@ import { JobApiResponse } from './interfaces/job-interface';
 import { ConfigService } from '@nestjs/config';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { GetJobsDto } from './dtos/job-query-params.dto';
 
 @Injectable()
 export class JobService {
@@ -17,30 +18,35 @@ export class JobService {
     private configService: ConfigService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
-  async getJobs(resumeId: string) {
+  async getJobs(resumeId: string, query: GetJobsDto) {
     const cacheKey = `jobs:${resumeId}`;
     const cached = await this.cacheManager.get(cacheKey);
     if (cached) {
       console.log('Hit cache');
       return cached;
     }
-    const params = await this.prepareParams(resumeId);
+
+    const postData = await this.preparePostBody(resumeId, query);
+
     const apiKey = this.configService.get<string>('RAPID_API_KEY')!;
     const apiUrl = this.configService.get<string>('RAPID_API_URL')!;
     const apiHost = this.configService.get<string>('RAPID_API_HOST')!;
-    const response = await axios.get<JobApiResponse>(apiUrl, {
-      params,
+
+    const response = await axios.post<JobApiResponse>(apiUrl, postData, {
       headers: {
         'X-RapidAPI-Key': apiKey,
         'X-RapidAPI-Host': apiHost,
+        'Content-Type': 'application/json',
       },
     });
+
     const data = response.data;
-    await this.cacheManager.set(cacheKey, data, 60 * 60 * 24 * 7);
+    await this.cacheManager.set(cacheKey, data, 60 * 60 * 24 * 7); // cache for 7 days
     console.log('Hit API call');
     return data;
   }
-  async prepareParams(resumeId: string) {
+
+  async preparePostBody(resumeId: string, query: GetJobsDto) {
     const resume = await this.resumeRepository.findOne({
       where: { id: resumeId },
     });
@@ -48,22 +54,19 @@ export class JobService {
       throw new NotFoundException('Resume not found');
     }
 
-    const queryParts: string[] = [];
+    const jobTitle = resume.currentJobTitle || '';
 
-    if (resume.currentJobTitle) queryParts.push(resume.currentJobTitle);
-    if (resume.skills?.length) queryParts.push(resume.skills.join(' '));
-    // if (resume.preferredJobLocation)
-    //   queryParts.push(`in ${resume.preferredJobLocation}`);
-
-    const query = queryParts.join(' ');
-
-    const params = {
-      query,
-      page: '1',
-      num_pages: '1',
-      country: 'us',
-      date_posted: 'week',
+    return {
+      // search_term,
+      search_term: jobTitle,
+      location: query.location || 'us', // You can make this dynamic later
+      results_wanted: query.results_wanted || 5,
+      site_name: ['indeed', 'linkedin', 'zip_recruiter', 'glassdoor'],
+      distance: query.distance || 50,
+      job_type: query.job_type || 'fulltime',
+      is_remote: query.is_remote || false,
+      linkedin_fetch_description: query.linkedin_fetch_description || false,
+      hours_old: query.hours_old || 72,
     };
-    return params;
   }
 }
