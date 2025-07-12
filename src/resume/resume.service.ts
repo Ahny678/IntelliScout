@@ -99,6 +99,7 @@ export class ResumeService {
     Object.assign(resume, body);
     //delete the cache
     const cacheKey = `jobs:${resume.id}`;
+
     await this.cacheManager.del(cacheKey);
 
     return this.resumeRepository.save(resume);

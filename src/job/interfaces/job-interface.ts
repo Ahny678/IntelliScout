@@ -1,3 +1,3 @@
 export interface JobApiResponse {
-  data: any;
+  jobs: any;
 }

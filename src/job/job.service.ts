@@ -9,7 +9,9 @@ import { ConfigService } from '@nestjs/config';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { GetJobsDto } from './dtos/job-query-params.dto';
-import { createCacheKey } from 'src/helpers/cache-hash';
+// import { createCacheKey } from 'src/helpers/cache-hash';
+import { addMatchScores } from 'src/helpers/job-match-score';
+import { isDtoEffectivelyEmpty } from 'src/helpers/isDtoEmpty';
 
 @Injectable()
 export class JobService {
@@ -20,12 +22,15 @@ export class JobService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
   async getJobs(resumeId: string, query: GetJobsDto) {
-    // const cacheKey = `jobs:${resumeId}`;
-    const cacheKey = createCacheKey(resumeId, query);
-    const cached = await this.cacheManager.get(cacheKey);
-    if (cached) {
-      console.log('Hit cache');
-      return cached;
+    const isQueryEmpty = isDtoEffectivelyEmpty(query);
+    console.log(`query empty? ${isQueryEmpty}`);
+    const cacheKey = `jobs:${resumeId}`;
+    if (isQueryEmpty) {
+      const cached = await this.cacheManager.get(cacheKey);
+      if (cached) {
+        console.log('Hit cache');
+        return cached;
+      }
     }
 
     const postData = await this.preparePostBody(resumeId, query);
@@ -43,8 +48,18 @@ export class JobService {
     });
 
     const data = response.data;
+
+    // Enrich jobs with match scores
+    const resume = await this.resumeRepository.findOne({
+      where: { id: resumeId },
+    });
+    if (!resume) throw new NotFoundException('Resume not found');
+
+    data.jobs = addMatchScores(data.jobs, resume);
+
     await this.cacheManager.set(cacheKey, data, 60 * 60 * 24 * 7); // cache for 7 days
     console.log('Hit API call');
+
     return data;
   }
 
