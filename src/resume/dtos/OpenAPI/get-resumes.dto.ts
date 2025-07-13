@@ -9,21 +9,21 @@ export class ResumeResponseDto {
    * Id of resume
    * @example "ud3u88ujf83292...."
    */
-  //   @ApiProperty()
+
   id: string;
 
   /**
    * Name of resume
    * @example "My First Resume...."
    */
-  //   @ApiProperty()
+
   name: string;
 
   /**
    * Job title of resume
    * @example "Human Resources Business Partner"
    */
-  //   @ApiProperty({ required: false })
+
   @ApiPropertyOptional()
   currentJobTitle?: string;
 
@@ -31,7 +31,7 @@ export class ResumeResponseDto {
    * User's years of experience in the field
    * @example "5"
    */
-  //   @ApiProperty({ required: false })
+
   @ApiPropertyOptional()
   yearsOfExperience?: number;
 
@@ -39,7 +39,7 @@ export class ResumeResponseDto {
    * Id of user
    * @example "[Hiring, Counseling, Leadership, Public Speaking]"
    */
-  //   @ApiProperty({ type: [String], required: false })
+
   @ApiPropertyOptional()
   skills?: string[];
 
@@ -47,7 +47,7 @@ export class ResumeResponseDto {
    * User's education level
    * @example "College"
    */
-  //   @ApiProperty({ required: false })
+
   @ApiPropertyOptional()
   highestEducationLevel?: string;
 
@@ -55,7 +55,7 @@ export class ResumeResponseDto {
    * User's Education
    * @example "Computer Science"
    */
-  //   @ApiProperty({ required: false })
+
   @ApiPropertyOptional()
   education?: EducationEntry[];
 
