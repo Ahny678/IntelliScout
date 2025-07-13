@@ -6,14 +6,14 @@ import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 export class AuthPayloadDto {
   /**
    * User's email address
-   * @example 'ahny@coders.com'
+   * @example 'yuji@jujutsu.com'
    */
   @IsEmail()
   email: string;
 
   /**
    * User's password
-   * @example 'yuriGenreAlways'
+   * @example 'InfinitVoid'
    */
   @IsNotEmpty()
   @MinLength(3)
