@@ -16,19 +16,11 @@ export enum JobType {
 }
 
 export class GetJobsDto {
-  /**
-   * Desired Location
-   * @example "europe"
-   */
   @IsOptional()
   @IsString()
   @ApiPropertyOptional()
   location: string;
 
-  /**
-   * Number of results to return
-   * @example 3
-   */
   @IsOptional()
   @Type(() => Number)
   @IsInt()

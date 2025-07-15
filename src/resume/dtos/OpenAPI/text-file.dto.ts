@@ -1,7 +1,14 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 
 export class OpenResumeDto {
+  @ApiProperty({
+    description: 'Resume name',
+    type: 'string',
+    example: 'Software dev cv',
+  })
+  @IsString()
+  resumeName: string;
   @ApiPropertyOptional({
     description: 'Plain text version of the resume',
     type: 'string',
@@ -18,5 +25,5 @@ export class OpenResumeDto {
     description: 'PDF file of the resume',
   })
   @IsOptional()
-  pdf?: any;
+  resumeFile?: any;
 }

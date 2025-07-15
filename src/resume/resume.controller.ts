@@ -41,7 +41,7 @@ export class ResumeController {
     @InjectQueue('process-resume') private resumeQueue: Queue,
   ) {}
   /**
-   * Create Diary entry
+   * Create a new Resume
    *
    * @remarks Collects resume information or cv.
    * @returns The resume object
@@ -60,7 +60,7 @@ export class ResumeController {
     description:
       'Resume submitted for processing. If successful, mail will be sent. Else, wrong input data',
   })
-  @ApiResponse({ status: 400, description: 'Bad Request — invalid diary data' })
+  @ApiResponse({ status: 400, description: 'Bad Request — invalid data' })
   @ApiResponse({
     status: 401,
     description: 'Unauthorized — user not authenticated',
@@ -122,7 +122,7 @@ export class ResumeController {
   /**
    * Update a resume
    *
-   * @remarks Update details of a specific resume.
+   * @remarks Update details of a specific resume. REMOVE BODY PARAMS THAT DO NOT NEED UPDATE.
    * @returns Resume updated details
    * @throws {401} Unauthorized — user not authenticated
    * @throws {500} Internal Server Error
