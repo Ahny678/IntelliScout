@@ -6,10 +6,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Resume } from './entities/resume.entity';
 import { BullModule } from '@nestjs/bullmq';
 import { ResumeConsumer } from './resume.worker';
+import { MailerModule } from 'src/mailer/mailer.module';
+import { User } from 'src/users/entities/user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Resume]),
+    TypeOrmModule.forFeature([Resume, User]),
     BullModule.forRoot({
       connection: {
         host: 'localhost',
@@ -24,6 +26,7 @@ import { ResumeConsumer } from './resume.worker';
     BullModule.registerQueue({
       name: 'process-resume',
     }),
+    MailerModule,
   ],
   controllers: [ResumeController],
   providers: [ResumeService, GptService, ResumeConsumer],

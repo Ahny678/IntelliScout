@@ -79,7 +79,7 @@ export class ResumeController {
     });
     return {
       message:
-        ' Resume submitted for processing. If successful, mail will be sent. Else, wrong input data',
+        ' Resume submitted for processing. If successful, You shall receive an email',
     };
   }
 

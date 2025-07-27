@@ -1,6 +1,8 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ResumeDto } from './dtos/resume.dto';
-import * as PdfParse from 'pdf-parse';
+// import * as PdfParse from 'pdf-parse';
+import pdfParse from 'pdf-parse';
+
 import { GptService } from './gpt.service';
 import { ResumeDataResult } from './interfaces/resume-json.interface';
 import { plainToInstance } from 'class-transformer';
@@ -33,7 +35,7 @@ export class ResumeService {
         text = body.resumeText;
       } else if (file) {
         const dataBuffer = file.buffer;
-        const parsed = await PdfParse(dataBuffer);
+        const parsed = await pdfParse(dataBuffer);
         text = parsed.text;
       }
       const json: ResumeDataResult =
@@ -118,4 +120,6 @@ export class ResumeService {
     await this.cacheManager.del(cacheKey);
     await this.resumeRepository.remove(resume);
   }
+
+  async sendEmail() {}
 }
