@@ -14,7 +14,11 @@ import { JobResponseDto } from './dtos/OpenAPI/get-job.dto';
 @Controller('job')
 export class JobController {
   constructor(private readonly jobsService: JobService) {}
-  @ApiParam({ name: 'resumeId', required: true, example: 'ye682901ehuiqjnk' })
+  @ApiParam({
+    name: 'resumeId',
+    required: true,
+    example: 'insert resume id...',
+  })
   @ApiOkResponse({
     description: 'List of matching jobs for the provided resume',
     type: [JobResponseDto],
